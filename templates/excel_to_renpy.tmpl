@@ -1,0 +1,6 @@
+{{range .Characters}}define {{.}} = Character("{{.}}")
+{{end}}
+label start:
+{{range .Scenes}}	scene {{.Scene}}{{range .Dialogues}}
+{{if .Character}}	{{.Character}} "{{.Dialogue}}"{{end}}{{end}}
+{{end}}

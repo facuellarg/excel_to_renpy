@@ -1,0 +1,35 @@
+= Excel to Renpy
+:toc: auto
+
+== Introduction
+This is a simple tool to convert an Excel file to a Renpy script. 
+Each sheet in the Excel file will be converted to a Renpy label. The order of the sheets will be the order of the labels in the script.
+
+There are 3 types of rows:
+
+* Dialogue: This row represents a dialogue. The columns character, and text are required. The columns expression, and position are optional.
+
+* Menu: This row represents a menu. The column <<options, options>> is required.
+
+* Scene: This row represents a scene. The column image is required. The column animation is optional.
+
+
+[id=options]
+== Options column
+
+This column is used to define the options for a menu. The options are separated by the pipe(*|*) character. if the options include a jump to a label, the label and the option should be separated by *;* character. for example:
+
+[,text]
+----
+text for option1;label1|text for option2;label2;option3;option4
+----
+== Example
+This is an example of an Excel file:
+[cols="1,1,1,1,1,1,1,1"]
+|===
+|kind|character |text |expression |position| options| image| animation
+|dialogue| John |Hello! |happy |left | | |
+|dialogue| John |How are you? |happy |left | | |
+|menu| | | | |Option1\|otherLabel;Option2;Option3 | |
+|scene| | | | |image1 | | |
+|===
