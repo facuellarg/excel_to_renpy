@@ -1,6 +1,8 @@
 {{range .Characters}}define {{.}} = Character("{{.}}")
 {{end}}
-label start:
-{{range .Scenes}}	scene {{.Scene}}{{range .Dialogues}}
+{{range .Labels}}label {{ .Label}}:{{range .Scenes}}
+{{if .Scene}}	scene {{.Scene}}{{end}}
+{{range .Dialogues}}
 {{if .Character}}	{{.Character}} "{{.Dialogue}}"{{end}}{{end}}
+{{end}}
 {{end}}

@@ -18,8 +18,10 @@ func TestReadRenpyInfo(t *testing.T) {
 			name: "Reads a Renpy file",
 			path: "test.xlsx",
 			renpyExpected: []RowInfo{
-				{"tester1", "dialog 1", "first scene"},
-				{"tester2", "dialog 2", "first scene"},
+				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+				{DialogueKind, "John", "How are you?", "happy", "left", "", "", ""},
+				{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+				{SceneKind, "", "", "", "", "", "imageScene", ""},
 			},
 			errExpected: nil,
 		},
@@ -28,7 +30,7 @@ func TestReadRenpyInfo(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			path := tt.path
-			renpyInfo, err := ReadRenpyInfo(path)
+			renpyInfo, err := ReadRenpyInfo(path, "start")
 
 			assert.ErrorIs(t, err, tt.errExpected)
 			// if err != nil {
@@ -37,9 +39,14 @@ func TestReadRenpyInfo(t *testing.T) {
 			// }
 			assert.Equal(t, len(tt.renpyExpected), len(renpyInfo))
 			for i, renpy := range renpyInfo {
+				assert.Equal(t, tt.renpyExpected[i].Kind, renpy.Kind)
 				assert.Equal(t, tt.renpyExpected[i].Character, renpy.Character)
-				assert.Equal(t, tt.renpyExpected[i].Dialogue, renpy.Dialogue)
-				assert.Equal(t, tt.renpyExpected[i].Scene, renpy.Scene)
+				assert.Equal(t, tt.renpyExpected[i].Text, renpy.Text)
+				assert.Equal(t, tt.renpyExpected[i].Expression, renpy.Expression)
+				assert.Equal(t, tt.renpyExpected[i].Position, renpy.Position)
+				assert.Equal(t, tt.renpyExpected[i].Options, renpy.Options)
+				assert.Equal(t, tt.renpyExpected[i].Image, renpy.Image)
+				assert.Equal(t, tt.renpyExpected[i].Animation, renpy.Animation)
 			}
 		})
 	}

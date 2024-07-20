@@ -9,30 +9,30 @@ import (
 type Header string
 
 const (
-	CHARACTER    Header = "character"
-	EXPRESSION   Header = "expression"
-	EMOTION      Header = "emotion"
-	BACKGROUND   Header = "background"
-	LOCATION     Header = "location"
-	DIALOGUE     Header = "dialogue"
-	SCENE        Header = "scene"
-	DIALOGUETYPE Header = "dialoguetype"
+	KIND       Header = "kind"
+	CHARACTER  Header = "character"
+	TEXT       Header = "text"
+	EXPRESSION Header = "expression"
+	POSITION   Header = "position"
+	OPTIONS    Header = "options"
+	IMAGE      Header = "image"
+	ANIMATION  Header = "animation"
 )
 
 var (
 	HEADERS = map[Header]int{
-		CHARACTER:    1,
-		EXPRESSION:   2,
-		EMOTION:      3,
-		BACKGROUND:   4,
-		LOCATION:     5,
-		DIALOGUE:     6,
-		SCENE:        7,
-		DIALOGUETYPE: 8,
+		KIND:       0,
+		CHARACTER:  1,
+		TEXT:       2,
+		EXPRESSION: 3,
+		POSITION:   4,
+		OPTIONS:    5,
+		IMAGE:      6,
+		ANIMATION:  7,
 	}
 )
 
-func ReadRenpyInfo(path string) ([]RowInfo, error) {
+func ReadRenpyInfo(path string, sheet string) ([]RowInfo, error) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,9 @@ func ReadRenpyInfo(path string) ([]RowInfo, error) {
 		}
 	}()
 
-	rows, err := f.GetRows("Sheet1")
+	rows, err := f.GetRows(sheet, excelize.Options{
+		RawCellValue: true,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -64,61 +66,31 @@ func ReadRenpyInfo(path string) ([]RowInfo, error) {
 	renpyInfos := make([]RowInfo, len(rows)-1)
 	for i, row := range rows[1:] {
 		renpyInfos[i] = RowInfo{
-			Character: row[HEADERS[CHARACTER]],
-			// Expression:   row[1],
-			// Emotion:      row[2],
-			// Background:   row[3],
-			// Location:     row[4],
-			Dialogue: row[HEADERS[DIALOGUE]],
-			Scene:    row[HEADERS[SCENE]],
-			// DialogueType: row[6],
+			Kind:       StringToKind(GetValue(row, HEADERS[KIND])),
+			Character:  GetValue(row, HEADERS[CHARACTER]),
+			Text:       GetValue(row, HEADERS[TEXT]),
+			Expression: GetValue(row, HEADERS[EXPRESSION]),
+			Position:   GetValue(row, HEADERS[POSITION]),
+			Options:    GetValue(row, HEADERS[OPTIONS]),
+			Image:      GetValue(row, HEADERS[IMAGE]),
+			Animation:  GetValue(row, HEADERS[ANIMATION]),
 		}
 	}
 
 	return renpyInfos, nil
 }
 
-func RowInfoToRenpy(rows []RowInfo) RenpyInfo {
-	renpyInfo := RenpyInfo{}
-	if len(rows) == 0 {
-		return renpyInfo
+func GetValue[T any](row []T, index int) T {
+	if index >= len(row) {
+		var zero T
+		return zero
 	}
+	return row[index]
+}
 
-	renpyInfo.Characters = make([]string, 0, len(rows))
-	charactersSet := make(map[string]struct{})
-
-	renpyInfo.Scenes = make([]Scene, 0, len(rows))
-	charactersSet[rows[0].Character] = struct{}{}
-	renpyInfo.Characters = append(renpyInfo.Characters, rows[0].Character)
-
-	renpyInfo.Scenes = append(renpyInfo.Scenes, Scene{
-		Scene: rows[0].Scene,
-		Dialogues: []Dialogue{
-			{Character: rows[0].Character, Dialogue: rows[0].Dialogue},
-		},
-	})
-	sceneIndex := 0
-	lastScene := rows[0].Scene
-	var d Dialogue
-
-	for _, row := range rows[1:] {
-		if _, ok := charactersSet[row.Character]; !ok {
-			charactersSet[row.Character] = struct{}{}
-			renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
-		}
-
-		d = Dialogue{Character: row.Character, Dialogue: row.Dialogue}
-		if row.Scene != lastScene {
-			sceneIndex++
-			lastScene = row.Scene
-			renpyInfo.Scenes = append(renpyInfo.Scenes, Scene{
-				Scene:     row.Scene,
-				Dialogues: []Dialogue{d},
-			})
-		} else {
-			renpyInfo.Scenes[sceneIndex].Dialogues = append(renpyInfo.Scenes[sceneIndex].Dialogues, d)
-		}
+func GetValueOrDefault[T any](row []T, index int, defaultValue T) T {
+	if index >= len(row) {
+		return defaultValue
 	}
-
-	return renpyInfo
+	return row[index]
 }

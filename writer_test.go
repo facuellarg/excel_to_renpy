@@ -9,33 +9,36 @@ import (
 func TestWriter(t *testing.T) {
 	tableTest := []struct {
 		name         string
-		renpyInfo    []RowInfo
+		rowsInfo     []RowInfo
 		textExpected string
 		errExpected  error
 	}{
 		{
 			name: "Writes a Renpy file",
-			renpyInfo: []RowInfo{
-				{"tester1", "dialog 1", "first scene"},
-				{"tester2", "dialog 2", "first scene"},
-				{"tester1", "dialog 3", "second scene"},
+			rowsInfo: []RowInfo{
+				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+				{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+				{SceneKind, "", "", "", "", "", "imageScene", ""},
+				{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
 			},
-			textExpected: `define tester1 = Character("tester1")
-define tester2 = Character("tester2")
+			textExpected: `define John = Character("John")
+define Tom = Character("Tom")
 
 label start:
-	scene first scene
-	tester1 "dialog 1"
-	tester2 "dialog 2"
-	scene second scene
-	tester1 "dialog 3"
+
+	John "Hello"
+	Tom "How are you?"
+
+	scene imageScene
+	John "Hello in scene2"
 `,
 			errExpected: nil,
 		},
 	}
 	for _, tt := range tableTest {
 		t.Run(tt.name, func(t *testing.T) {
-			renpyInfo := tt.renpyInfo
+			renpyInfo := tt.rowsInfo
 			writer := NewWriter("./templates/excel_to_renpy.tmpl")
 			text, err := writer.RenpyInfoToText(renpyInfo)
 			print(text)
