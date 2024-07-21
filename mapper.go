@@ -16,8 +16,8 @@ type Mapper struct {
 
 func NewDefaultMapper() *Mapper {
 	return &Mapper{
-		optionsSplitChar: ";",
-		labelSplitChar:   "|",
+		optionsSplitChar: "|",
+		labelSplitChar:   ";",
 	}
 }
 
@@ -33,29 +33,40 @@ func (m *Mapper) RowsInfoToRenpyInfo(rows []RowInfo) (*RenpyInfo, error) {
 	renpyInfo.Labels = append(renpyInfo.Labels, Label{
 		Label: "start",
 	})
+	currentScene := renpyInfo.Labels[0].Scenes
 	for _, row := range rows {
 		if row.Kind == SceneKind {
-			renpyInfo.Labels[0].Scenes = append(renpyInfo.Labels[0].Scenes, Scene{
+			currentScene = append(currentScene, Scene{
 				Scene:    row.Image,
 				Commands: []Command{},
 			})
 		}
 
 		if row.Kind == DialogueKind {
-			if len(renpyInfo.Labels[0].Scenes) == 0 {
+			if len(currentScene) == 0 {
 				// return nil, errors.New("No scene found")
-				renpyInfo.Labels[0].Scenes = append(renpyInfo.Labels[0].Scenes, Scene{})
+				currentScene = append(currentScene, Scene{})
 			}
 			if _, ok := charactersSet[row.Character]; !ok {
 				charactersSet[row.Character] = struct{}{}
 				renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
 			}
-			renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Commands = append(renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Commands, Dialogue{
+			currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Dialogue{
 				Character: row.Character,
 				Dialogue:  row.Text,
 			})
 		}
+		if row.Kind == MenuKind {
+			options, err := m.ParseOptions(row.Options)
+			if err != nil {
+				return nil, err
+			}
+			currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Menu{
+				Options: options,
+			})
+		}
 	}
+	renpyInfo.Labels[0].Scenes = currentScene
 	return &renpyInfo, nil
 
 }

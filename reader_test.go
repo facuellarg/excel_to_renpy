@@ -20,7 +20,7 @@ func TestReadRenpyInfo(t *testing.T) {
 			renpyExpected: []RowInfo{
 				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
 				{DialogueKind, "John", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
 				{SceneKind, "", "", "", "", "", "imageScene", ""},
 			},
 			errExpected: nil,

@@ -18,7 +18,7 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 			rowsInfo: []RowInfo{
 				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
 				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
 				{SceneKind, "", "", "", "", "", "imageScene", ""},
 				{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
 			},
@@ -27,7 +27,16 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				Labels: []Label{
 					{
 						Label: "start", Scenes: []Scene{
-							{"", []Command{Dialogue{"John", "Hello"}, Dialogue{"Tom", "How are you?"}}},
+							{"", []Command{
+								Dialogue{"John", "Hello"},
+								Dialogue{"Tom", "How are you?"},
+								Menu{Options: []Options{
+									{"option1", "otherLabel"},
+									{"option2", ""},
+									{"option3", ""},
+								}},
+							},
+							},
 							{"imageScene", []Command{Dialogue{"John", "Hello in scene2"}}},
 						},
 					},
@@ -201,12 +210,12 @@ func TestParseOptions(t *testing.T) {
 	}{
 		{
 			name:     "Parses options",
-			options:  "option1|otherLabel;option2;option3",
+			options:  "option1;otherLabel|option2|option3",
 			expected: []Options{{"option1", "otherLabel"}, {"option2", ""}, {"option3", ""}},
 		},
 		{
 			name:        "Invalid options",
-			options:     "option|label|label;option2",
+			options:     "option;label;label|option2",
 			expected:    nil,
 			errExpected: ErrInvalidOptions,
 		},

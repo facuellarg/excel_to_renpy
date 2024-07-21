@@ -18,7 +18,6 @@ func TestWriter(t *testing.T) {
 			rowsInfo: []RowInfo{
 				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
 				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
 				{SceneKind, "", "", "", "", "", "imageScene", ""},
 				{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
 			},
@@ -32,6 +31,33 @@ label start:
 
   scene imageScene
   John "Hello in scene2"
+`,
+			errExpected: nil,
+		},
+		{
+			name: "Writes a Renpy file with menu",
+			rowsInfo: []RowInfo{
+				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+				{SceneKind, "", "", "", "", "", "imageScene", ""},
+				{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+			},
+			textExpected: `define John = Character("John")
+define Tom = Character("Tom")
+
+label start:
+
+  John "Hello"
+  Tom "How are you?"
+
+  scene imageScene
+  John "Hello in scene2"
+  menu:
+    "option1":
+      jump otherLabel
+    "option2"
+    "option3"
 `,
 			errExpected: nil,
 		},

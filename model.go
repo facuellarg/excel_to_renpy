@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"bytes"
+	"log"
+)
 
 type Kind int
 
@@ -42,6 +45,10 @@ type Dialogue struct {
 	Dialogue  string
 }
 
+type Menu struct {
+	Options []Options
+}
+
 type Options struct {
 	Text  string
 	Label string
@@ -53,6 +60,22 @@ type Command interface {
 
 func (d Dialogue) Build() string {
 	return d.Character + " " + "\"" + d.Dialogue + "\""
+}
+
+func (o Menu) Build() string {
+	var buffer bytes.Buffer
+	if len(o.Options) == 0 {
+		return ""
+	}
+	buffer.WriteString("menu:")
+	for _, option := range o.Options {
+		buffer.WriteString("\n")
+		buffer.WriteString("    \"" + option.Text + "\"")
+		if option.Label != "" {
+			buffer.WriteString(":\n      jump " + option.Label)
+		}
+	}
+	return buffer.String()
 }
 
 func StringToKind(kind string) Kind {
