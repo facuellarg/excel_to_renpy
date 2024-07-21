@@ -14,6 +14,11 @@ const (
 	DialogueKind
 )
 
+type SheetInfo struct {
+	Name string
+	Rows []RowInfo
+}
+
 type RowInfo struct {
 	Kind       Kind
 	Character  string

@@ -9,18 +9,23 @@ import (
 func TestRowsInfoToRenpyInfo(t *testing.T) {
 	tt := []struct {
 		name        string
-		rowsInfo    []RowInfo
+		rowsInfo    []SheetInfo
 		renpyInfo   *RenpyInfo
 		errExpected error
 	}{
 		{
 			name: "Converts rows to RenpyInfo",
-			rowsInfo: []RowInfo{
-				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-				{SceneKind, "", "", "", "", "", "imageScene", ""},
-				{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+			rowsInfo: []SheetInfo{
+				{
+					Name: "start",
+					Rows: []RowInfo{
+						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+						{SceneKind, "", "", "", "", "", "imageScene", ""},
+						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+					},
+				},
 			},
 			renpyInfo: &RenpyInfo{
 				Characters: []string{"John", "Tom"},

@@ -21,52 +21,61 @@ func NewDefaultMapper() *Mapper {
 	}
 }
 
-func (m *Mapper) RowsInfoToRenpyInfo(rows []RowInfo) (*RenpyInfo, error) {
-	if len(rows) == 0 {
+func (m *Mapper) RowsInfoToRenpyInfo(sheets []SheetInfo) (*RenpyInfo, error) {
+	if len(sheets) == 0 {
 		return nil, nil
 	}
-	renpyInfo := RenpyInfo{}
 
-	renpyInfo.Characters = make([]string, 0, len(rows))
+	renpyInfo := RenpyInfo{}
+	renpyInfo.Characters = make([]string, 0)
 	charactersSet := make(map[string]struct{})
 	renpyInfo.Labels = make([]Label, 0)
-	renpyInfo.Labels = append(renpyInfo.Labels, Label{
-		Label: "start",
-	})
-	currentScene := renpyInfo.Labels[0].Scenes
-	for _, row := range rows {
-		if row.Kind == SceneKind {
-			currentScene = append(currentScene, Scene{
-				Scene:    row.Image,
-				Commands: []Command{},
-			})
+
+	for i, sheet := range sheets {
+		rows := sheet.Rows
+		if len(rows) == 0 {
+			return nil, nil
 		}
 
-		if row.Kind == DialogueKind {
-			if len(currentScene) == 0 {
-				// return nil, errors.New("No scene found")
-				currentScene = append(currentScene, Scene{})
+		renpyInfo.Labels = append(renpyInfo.Labels, Label{
+			Label: sheet.Name,
+		})
+
+		currentScene := renpyInfo.Labels[i].Scenes
+		for _, row := range rows {
+			if row.Kind == SceneKind {
+				currentScene = append(currentScene, Scene{
+					Scene:    row.Image,
+					Commands: []Command{},
+				})
 			}
-			if _, ok := charactersSet[row.Character]; !ok {
-				charactersSet[row.Character] = struct{}{}
-				renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
+
+			if row.Kind == DialogueKind {
+				if len(currentScene) == 0 {
+					// return nil, errors.New("No scene found")
+					currentScene = append(currentScene, Scene{})
+				}
+				if _, ok := charactersSet[row.Character]; !ok {
+					charactersSet[row.Character] = struct{}{}
+					renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
+				}
+				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Dialogue{
+					Character: row.Character,
+					Dialogue:  row.Text,
+				})
 			}
-			currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Dialogue{
-				Character: row.Character,
-				Dialogue:  row.Text,
-			})
+			if row.Kind == MenuKind {
+				options, err := m.ParseOptions(row.Options)
+				if err != nil {
+					return nil, err
+				}
+				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Menu{
+					Options: options,
+				})
+			}
 		}
-		if row.Kind == MenuKind {
-			options, err := m.ParseOptions(row.Options)
-			if err != nil {
-				return nil, err
-			}
-			currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Menu{
-				Options: options,
-			})
-		}
+		renpyInfo.Labels[i].Scenes = currentScene
 	}
-	renpyInfo.Labels[0].Scenes = currentScene
 	return &renpyInfo, nil
 
 }

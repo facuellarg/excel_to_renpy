@@ -23,7 +23,7 @@ func NewWriter(path string) *Writer {
 	return &w
 }
 
-func (w *Writer) RenpyInfoToText(rows []RowInfo) (string, error) {
+func (w *Writer) RenpyInfoToText(rows []SheetInfo) (string, error) {
 	renpyInfo, err := w.mapper.RowsInfoToRenpyInfo(rows)
 	if err != nil {
 		return "", err

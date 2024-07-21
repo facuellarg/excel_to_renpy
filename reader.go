@@ -32,18 +32,34 @@ var (
 	}
 )
 
-func ReadRenpyInfo(path string, sheet string) ([]RowInfo, error) {
+func ReadExcel(path string) ([]SheetInfo, error) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		return nil, err
 	}
-
 	defer func() {
 		// Close the file
 		if err := f.Close(); err != nil {
 			panic(err)
 		}
 	}()
+	sheetNames := f.GetSheetList()
+	sheetInfos := make([]SheetInfo, len(sheetNames))
+	for i, sheet := range sheetNames {
+		rows, err := ReadSheetInfo(f, sheet)
+		if err != nil {
+			return nil, err
+		}
+		sheetInfos[i] = SheetInfo{
+			Name: sheet,
+			Rows: rows,
+		}
+	}
+
+	return sheetInfos, nil
+}
+
+func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
 
 	rows, err := f.GetRows(sheet, excelize.Options{
 		RawCellValue: true,
