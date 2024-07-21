@@ -25,6 +25,7 @@ text for option1;label1|option2;label2|option3;option4
 ----
 == Example
 This is an example of an Excel file:
+
 [cols="1,1,1,1,1,1,1,1"]
 |===
 |kind|character |text |expression |position| options| image| animation
