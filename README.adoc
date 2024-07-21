@@ -21,7 +21,7 @@ This column is used to define the options for a menu. The options are separated 
 
 [,text]
 ----
-text for option1;label1|text for option2;label2;option3;option4
+text for option1;label1|option2;label2|option3;option4
 ----
 == Example
 This is an example of an Excel file:
@@ -30,6 +30,6 @@ This is an example of an Excel file:
 |kind|character |text |expression |position| options| image| animation
 |dialogue| John |Hello! |happy |left | | |
 |dialogue| John |How are you? |happy |left | | |
-|menu| | | | |Option1\|otherLabel;Option2;Option3 | |
+|menu| | | | |Option1;otherLabel\|Option2\|Option3 | |
 |scene| | | | |image1 | | |
 |===
