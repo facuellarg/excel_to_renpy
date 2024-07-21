@@ -27,8 +27,8 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				Labels: []Label{
 					{
 						Label: "start", Scenes: []Scene{
-							{"", []Dialogue{{"John", "Hello"}, {"Tom", "How are you?"}}},
-							{"imageScene", []Dialogue{{"John", "Hello in scene2"}}},
+							{"", []Command{Dialogue{"John", "Hello"}, Dialogue{"Tom", "How are you?"}}},
+							{"imageScene", []Command{Dialogue{"John", "Hello in scene2"}}},
 						},
 					},
 				},
@@ -60,10 +60,9 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				assert.Equal(t, len(sceneExpected), len(label.Scenes))
 				for i, scene := range label.Scenes {
 					assert.Equal(t, sceneExpected[i].Scene, scene.Scene)
-					assert.Equal(t, len(sceneExpected[i].Dialogues), len(scene.Dialogues))
-					for j, dialogue := range scene.Dialogues {
-						assert.Equal(t, sceneExpected[i].Dialogues[j].Character, dialogue.Character)
-						assert.Equal(t, sceneExpected[i].Dialogues[j].Dialogue, dialogue.Dialogue)
+					assert.Equal(t, len(sceneExpected[i].Commands), len(scene.Commands))
+					for j, command := range scene.Commands {
+						assert.Equal(t, sceneExpected[i].Commands[j].Build(), command.Build())
 					}
 				}
 			}

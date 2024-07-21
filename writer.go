@@ -10,9 +10,15 @@ type Writer struct {
 	mapper       *Mapper
 }
 
+func build(commands Command) string {
+	return commands.Build()
+}
+
 func NewWriter(path string) *Writer {
 	w := Writer{}
-	w.excelToRenpy = template.Must(template.ParseFiles(path))
+	w.excelToRenpy = template.Must(template.New("excel_to_renpy.tmpl").Funcs(template.FuncMap{
+		"build": build,
+	}).ParseFiles(path))
 	w.mapper = NewDefaultMapper()
 	return &w
 }

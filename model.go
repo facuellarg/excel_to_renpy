@@ -28,8 +28,8 @@ type RenpyInfo struct {
 }
 
 type Scene struct {
-	Scene     string
-	Dialogues []Dialogue
+	Scene    string
+	Commands []Command
 }
 
 type Label struct {
@@ -45,6 +45,14 @@ type Dialogue struct {
 type Options struct {
 	Text  string
 	Label string
+}
+
+type Command interface {
+	Build() string
+}
+
+func (d Dialogue) Build() string {
+	return d.Character + " " + "\"" + d.Dialogue + "\""
 }
 
 func StringToKind(kind string) Kind {

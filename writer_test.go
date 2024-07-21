@@ -27,11 +27,11 @@ define Tom = Character("Tom")
 
 label start:
 
-	John "Hello"
-	Tom "How are you?"
+  John "Hello"
+  Tom "How are you?"
 
-	scene imageScene
-	John "Hello in scene2"
+  scene imageScene
+  John "Hello in scene2"
 `,
 			errExpected: nil,
 		},

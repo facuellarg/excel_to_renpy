@@ -36,8 +36,8 @@ func (m *Mapper) RowsInfoToRenpyInfo(rows []RowInfo) (*RenpyInfo, error) {
 	for _, row := range rows {
 		if row.Kind == SceneKind {
 			renpyInfo.Labels[0].Scenes = append(renpyInfo.Labels[0].Scenes, Scene{
-				Scene:     row.Image,
-				Dialogues: []Dialogue{},
+				Scene:    row.Image,
+				Commands: []Command{},
 			})
 		}
 
@@ -50,7 +50,7 @@ func (m *Mapper) RowsInfoToRenpyInfo(rows []RowInfo) (*RenpyInfo, error) {
 				charactersSet[row.Character] = struct{}{}
 				renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
 			}
-			renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Dialogues = append(renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Dialogues, Dialogue{
+			renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Commands = append(renpyInfo.Labels[0].Scenes[len(renpyInfo.Labels[0].Scenes)-1].Commands, Dialogue{
 				Character: row.Character,
 				Dialogue:  row.Text,
 			})
