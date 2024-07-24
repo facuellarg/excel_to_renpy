@@ -29,9 +29,9 @@ func TestReadExcel(t *testing.T) {
 					},
 				},
 				{
-					Name: "anotherLabel",
+					Name: "otherLabel",
 					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello from another label", "happy", "left", "", "", ""},
+						{DialogueKind, "Tom", "Hello from another label", "happy", "left", "", "", ""},
 					},
 				},
 			},
