@@ -7,7 +7,7 @@ Each sheet in the Excel file will be converted to a Renpy label. The order of th
 
 There are 3 types of rows:
 
-* Dialogue: This row represents a dialogue. The columns character, and text are required. The columns expression, and position are optional.
+* Dialogue: This row represents a dialogue. The columns character, and text are required. The columns expression, and position are optional. If the character is not being showed it will be added before the dialogue.
 
 * Menu: This row represents a menu. The column <<options, options>> is required.
 
@@ -23,14 +23,38 @@ This column is used to define the options for a menu. The options are separated 
 ----
 text for option1;label1|option2;label2|option3;option4
 ----
-== Example
-This is an example of an Excel file:
 
-[cols="1,1,1,1,1,1,1,1"]
+== HIDE column
+*Hide* column is an optional column that can be used in any row, this column could be empty or contain a list of characters separated by a pipe(*|*) character. This column is used to hide the characters in the list when the row is not empty.
+
+
+== Example
+This is an example of an Excel file in a `start` sheet:
+
+// [cols="1,1,1,1,1,1,1,1,1",options="header"]
 |===
-|kind|character |text |expression |position| options| image| animation
-|dialogue| John |Hello! |happy |left | | |
-|dialogue| John |How are you? |happy |left | | |
-|menu| | | | |Option1;otherLabel\|Option2\|Option3 | |
-|scene| | | | |image1 | | |
+|kind|character |text |expression |position| options| image| animation | hide
+
+|dialogue| John |Hello! |happy |left | | | |
+|dialogue| John |How are you? |happy |left | | | |
+|menu| | | | |Option1;otherLabel\|Option2\|Option3 | |  |John 
+|scene| | | | |image1 | | | 
 |===
+
+This is the Renpy script generated:
+[,renpy]
+----
+define John = Character('John')
+
+label start:
+    show John happy at left
+    "Hello!"
+    "How are you?"
+    hide john
+    menu:
+        "Option1":
+            jump otherLabel
+        "Option2":
+        "Option3":
+    scene image1
+----
