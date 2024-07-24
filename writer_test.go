@@ -1,6 +1,7 @@
 package main
 
 import (
+	"renpy-transformer/models"
 	"strings"
 	"testing"
 
@@ -10,20 +11,20 @@ import (
 func TestWriter(t *testing.T) {
 	tableTest := []struct {
 		name         string
-		sheetsInfo   []SheetInfo
+		sheetsInfo   []models.SheetInfo
 		textExpected string
 		errExpected  error
 	}{
 		{
 			name: "Writes a Renpy file",
-			sheetsInfo: []SheetInfo{
+			sheetsInfo: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
+						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
 					},
 				},
 			},
@@ -41,15 +42,15 @@ label start:
 		},
 		{
 			name: "Writes a Renpy file with menu",
-			sheetsInfo: []SheetInfo{
+			sheetsInfo: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
+						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
 					},
 				},
 			},
@@ -72,21 +73,21 @@ label start:
 		},
 		{
 			name: "Writes a Renpy file with two sheets",
-			sheetsInfo: []SheetInfo{
+			sheetsInfo: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
+						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
 					},
 				},
 				{
 					Name: "anotherLabel",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello in another label", "happy", "left", "", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello in another label", "happy", "left", "", "", ""},
 					},
 				},
 			},

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"renpy-transformer/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,26 +13,26 @@ func TestReadExcel(t *testing.T) {
 	tableTest := []struct {
 		name              string
 		path              string
-		sheetInfoExpected []SheetInfo
+		sheetInfoExpected []models.SheetInfo
 		errExpected       error
 	}{
 		{
 			name: "Reads a Renpy file with two sheets",
 			path: "test.xlsx",
-			sheetInfoExpected: []SheetInfo{
+			sheetInfoExpected: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
 					},
 				},
 				{
 					Name: "otherLabel",
-					Rows: []RowInfo{
-						{DialogueKind, "Tom", "Hello from another label", "happy", "left", "", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "Tom", "Hello from another label", "happy", "left", "", "", ""},
 					},
 				},
 			},
@@ -71,17 +72,17 @@ func TestReadSheetInfo(t *testing.T) {
 	tableTest := []struct {
 		name          string
 		path          string
-		renpyExpected []RowInfo
+		renpyExpected []models.RowInfo
 		errExpected   error
 	}{
 		{
 			name: "Reads a Renpy file",
 			path: "test.xlsx",
-			renpyExpected: []RowInfo{
-				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-				{SceneKind, "", "", "", "", "", "imageScene", ""},
+			renpyExpected: []models.RowInfo{
+				{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+				{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+				{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+				{models.SceneKind, "", "", "", "", "", "imageScene", ""},
 			},
 			errExpected: nil,
 		},

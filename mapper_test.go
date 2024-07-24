@@ -1,6 +1,7 @@
 package main
 
 import (
+	"renpy-transformer/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,40 +10,40 @@ import (
 func TestRowsInfoToRenpyInfo(t *testing.T) {
 	tt := []struct {
 		name        string
-		rowsInfo    []SheetInfo
-		renpyInfo   *RenpyInfo
+		rowsInfo    []models.SheetInfo
+		renpyInfo   *models.RenpyInfo
 		errExpected error
 	}{
 		{
 			name: "Converts rows to RenpyInfo",
-			rowsInfo: []SheetInfo{
+			rowsInfo: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+					Rows: []models.RowInfo{
+						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
+						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
+						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
 					},
 				},
 			},
-			renpyInfo: &RenpyInfo{
+			renpyInfo: &models.RenpyInfo{
 				Characters: []string{"John", "Tom"},
-				Labels: []Label{
+				Labels: []models.Label{
 					{
-						Label: "start", Scenes: []Scene{
-							{"", []Command{
-								Dialogue{"John", "Hello"},
-								Dialogue{"Tom", "How are you?"},
-								Menu{Options: []Options{
+						Label: "start", Scenes: []models.Scene{
+							{"", []models.Command{
+								models.Dialogue{"John", "Hello"},
+								models.Dialogue{"Tom", "How are you?"},
+								models.Menu{Options: []models.Options{
 									{"option1", "otherLabel"},
 									{"option2", ""},
 									{"option3", ""},
 								}},
 							},
 							},
-							{"imageScene", []Command{Dialogue{"John", "Hello in scene2"}}},
+							{"imageScene", []models.Command{models.Dialogue{"John", "Hello in scene2"}}},
 						},
 					},
 				},
@@ -89,25 +90,25 @@ func TestValidateDialogue(t *testing.T) {
 
 	tt := []struct {
 		name        string
-		rowInfo     RowInfo
+		rowInfo     models.RowInfo
 		expected    bool
 		errExpected error
 	}{
 		{
 			name:        "Dialogue is valid",
-			rowInfo:     RowInfo{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Dialogue",
-			rowInfo:     RowInfo{MenuKind, "John", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{models.MenuKind, "John", "Hello", "happy", "left", "", "", ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Character is empty",
-			rowInfo:     RowInfo{DialogueKind, "", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{models.DialogueKind, "", "Hello", "happy", "left", "", "", ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -129,25 +130,25 @@ func TestValidateDialogue(t *testing.T) {
 func TestValidateScene(t *testing.T) {
 	tt := []struct {
 		name        string
-		rowInfo     RowInfo
+		rowInfo     models.RowInfo
 		expected    bool
 		errExpected error
 	}{
 		{
 			name:        "Scene is valid",
-			rowInfo:     RowInfo{SceneKind, "", "", "", "", "", "imageScene", ""},
+			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "", "imageScene", ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Scene with empty image",
-			rowInfo:     RowInfo{SceneKind, "", "", "", "", "", "", ""},
+			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "", "", ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Scene",
-			rowInfo:     RowInfo{MenuKind, "", "", "", "", "", "imageScene", ""},
+			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "", "imageScene", ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -169,25 +170,25 @@ func TestValidateScene(t *testing.T) {
 func TestValidateMenu(t *testing.T) {
 	tt := []struct {
 		name        string
-		rowInfo     RowInfo
+		rowInfo     models.RowInfo
 		expected    bool
 		errExpected error
 	}{
 		{
 			name:        "Menu is valid",
-			rowInfo:     RowInfo{MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Options is empty",
-			rowInfo:     RowInfo{MenuKind, "", "", "", "", "", "", ""},
+			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "", "", ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Menu",
-			rowInfo:     RowInfo{SceneKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -210,13 +211,13 @@ func TestParseOptions(t *testing.T) {
 	tt := []struct {
 		name        string
 		options     string
-		expected    []Options
+		expected    []models.Options
 		errExpected error
 	}{
 		{
 			name:     "Parses options",
 			options:  "option1;otherLabel|option2|option3",
-			expected: []Options{{"option1", "otherLabel"}, {"option2", ""}, {"option3", ""}},
+			expected: []models.Options{{"option1", "otherLabel"}, {"option2", ""}, {"option3", ""}},
 		},
 		{
 			name:        "Invalid options",

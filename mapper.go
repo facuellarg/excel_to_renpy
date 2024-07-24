@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"renpy-transformer/models"
 	"strings"
 )
 
@@ -21,15 +22,15 @@ func NewDefaultMapper() *Mapper {
 	}
 }
 
-func (m *Mapper) RowsInfoToRenpyInfo(sheets []SheetInfo) (*RenpyInfo, error) {
+func (m *Mapper) RowsInfoToRenpyInfo(sheets []models.SheetInfo) (*models.RenpyInfo, error) {
 	if len(sheets) == 0 {
 		return nil, nil
 	}
 
-	renpyInfo := RenpyInfo{}
+	renpyInfo := models.RenpyInfo{}
 	renpyInfo.Characters = make([]string, 0)
 	charactersSet := make(map[string]struct{})
-	renpyInfo.Labels = make([]Label, 0)
+	renpyInfo.Labels = make([]models.Label, 0)
 
 	for i, sheet := range sheets {
 		rows := sheet.Rows
@@ -37,39 +38,39 @@ func (m *Mapper) RowsInfoToRenpyInfo(sheets []SheetInfo) (*RenpyInfo, error) {
 			return nil, nil
 		}
 
-		renpyInfo.Labels = append(renpyInfo.Labels, Label{
+		renpyInfo.Labels = append(renpyInfo.Labels, models.Label{
 			Label: sheet.Name,
 		})
 
 		currentScene := renpyInfo.Labels[i].Scenes
 		for _, row := range rows {
-			if row.Kind == SceneKind {
-				currentScene = append(currentScene, Scene{
+			if row.Kind == models.SceneKind {
+				currentScene = append(currentScene, models.Scene{
 					Scene:    row.Image,
-					Commands: []Command{},
+					Commands: []models.Command{},
 				})
 			}
 
-			if row.Kind == DialogueKind {
+			if row.Kind == models.DialogueKind {
 				if len(currentScene) == 0 {
 					// return nil, errors.New("No scene found")
-					currentScene = append(currentScene, Scene{})
+					currentScene = append(currentScene, models.Scene{})
 				}
 				if _, ok := charactersSet[row.Character]; !ok {
 					charactersSet[row.Character] = struct{}{}
 					renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
 				}
-				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Dialogue{
+				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, models.Dialogue{
 					Character: row.Character,
 					Dialogue:  row.Text,
 				})
 			}
-			if row.Kind == MenuKind {
+			if row.Kind == models.MenuKind {
 				options, err := m.ParseOptions(row.Options)
 				if err != nil {
 					return nil, err
 				}
-				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, Menu{
+				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, models.Menu{
 					Options: options,
 				})
 			}
@@ -80,8 +81,8 @@ func (m *Mapper) RowsInfoToRenpyInfo(sheets []SheetInfo) (*RenpyInfo, error) {
 
 }
 
-func (m *Mapper) ValidateDialog(row RowInfo) (bool, error) {
-	if row.Kind != DialogueKind {
+func (m *Mapper) ValidateDialog(row models.RowInfo) (bool, error) {
+	if row.Kind != models.DialogueKind {
 		return false, nil
 	}
 
@@ -96,8 +97,8 @@ func (m *Mapper) ValidateDialog(row RowInfo) (bool, error) {
 	return true, nil
 }
 
-func (m *Mapper) ValidateScene(row RowInfo) (bool, error) {
-	if row.Kind != SceneKind {
+func (m *Mapper) ValidateScene(row models.RowInfo) (bool, error) {
+	if row.Kind != models.SceneKind {
 		return false, nil
 	}
 
@@ -108,8 +109,8 @@ func (m *Mapper) ValidateScene(row RowInfo) (bool, error) {
 	return true, nil
 }
 
-func (m *Mapper) ValidateMenu(row RowInfo) (bool, error) {
-	if row.Kind != MenuKind {
+func (m *Mapper) ValidateMenu(row models.RowInfo) (bool, error) {
+	if row.Kind != models.MenuKind {
 		return false, nil
 	}
 
@@ -120,14 +121,14 @@ func (m *Mapper) ValidateMenu(row RowInfo) (bool, error) {
 
 }
 
-func (m *Mapper) ParseOptions(options string) ([]Options, error) {
+func (m *Mapper) ParseOptions(options string) ([]models.Options, error) {
 
 	if options == "" {
 		return nil, nil
 	}
 
 	optionsSplit := strings.Split(options, m.optionsSplitChar)
-	optionsList := make([]Options, 0, len(optionsSplit))
+	optionsList := make([]models.Options, 0, len(optionsSplit))
 
 	for _, option := range optionsSplit {
 		optionSplit := strings.Split(option, m.labelSplitChar)
@@ -135,7 +136,7 @@ func (m *Mapper) ParseOptions(options string) ([]Options, error) {
 			return nil, ErrInvalidOptions
 		}
 
-		op := Options{
+		op := models.Options{
 			Text: optionSplit[0],
 		}
 		if len(optionSplit) == 2 {

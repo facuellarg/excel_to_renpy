@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"renpy-transformer/models"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -32,7 +33,7 @@ var (
 	}
 )
 
-func ReadExcel(path string) ([]SheetInfo, error) {
+func ReadExcel(path string) ([]models.SheetInfo, error) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		return nil, err
@@ -44,13 +45,13 @@ func ReadExcel(path string) ([]SheetInfo, error) {
 		}
 	}()
 	sheetNames := f.GetSheetList()
-	sheetInfos := make([]SheetInfo, len(sheetNames))
+	sheetInfos := make([]models.SheetInfo, len(sheetNames))
 	for i, sheet := range sheetNames {
 		rows, err := ReadSheetInfo(f, sheet)
 		if err != nil {
 			return nil, err
 		}
-		sheetInfos[i] = SheetInfo{
+		sheetInfos[i] = models.SheetInfo{
 			Name: sheet,
 			Rows: rows,
 		}
@@ -59,7 +60,7 @@ func ReadExcel(path string) ([]SheetInfo, error) {
 	return sheetInfos, nil
 }
 
-func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
+func ReadSheetInfo(f *excelize.File, sheet string) ([]models.RowInfo, error) {
 
 	rows, err := f.GetRows(sheet, excelize.Options{
 		RawCellValue: true,
@@ -79,10 +80,10 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
 		HEADERS[h] = j
 	}
 
-	renpyInfos := make([]RowInfo, len(rows)-1)
+	renpyInfos := make([]models.RowInfo, len(rows)-1)
 	for i, row := range rows[1:] {
-		renpyInfos[i] = RowInfo{
-			Kind:       StringToKind(GetValue(row, HEADERS[KIND])),
+		renpyInfos[i] = models.RowInfo{
+			Kind:       models.StringToKind(GetValue(row, HEADERS[KIND])),
 			Character:  GetValue(row, HEADERS[CHARACTER]),
 			Text:       GetValue(row, HEADERS[TEXT]),
 			Expression: GetValue(row, HEADERS[EXPRESSION]),
