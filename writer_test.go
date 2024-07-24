@@ -21,10 +21,10 @@ func TestWriter(t *testing.T) {
 				{
 					Name: "start",
 					Rows: []models.RowInfo{
-						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
-						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 					},
 				},
 			},
@@ -46,11 +46,11 @@ label start:
 				{
 					Name: "start",
 					Rows: []models.RowInfo{
-						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
-						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1;otherLabel|option2|option3", Image: "", Animation: ""},
 					},
 				},
 			},
@@ -77,17 +77,17 @@ label start:
 				{
 					Name: "start",
 					Rows: []models.RowInfo{
-						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
-						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1;otherLabel|option2|option3", Image: "", Animation: ""},
 					},
 				},
 				{
 					Name: "anotherLabel",
 					Rows: []models.RowInfo{
-						{models.DialogueKind, "John", "Hello in another label", "happy", "left", "", "", ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in another label", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 					},
 				},
 			},

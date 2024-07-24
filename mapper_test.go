@@ -20,11 +20,11 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				{
 					Name: "start",
 					Rows: []models.RowInfo{
-						{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{models.DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{models.MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-						{models.SceneKind, "", "", "", "", "", "imageScene", ""},
-						{models.DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1;otherLabel|option2|option3", Image: "", Animation: ""},
+						{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 					},
 				},
 			},
@@ -33,17 +33,17 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				Labels: []models.Label{
 					{
 						Label: "start", Scenes: []models.Scene{
-							{"", []models.Command{
-								models.Dialogue{"John", "Hello"},
-								models.Dialogue{"Tom", "How are you?"},
+							{Scene: "", Commands: []models.Command{
+								models.Dialogue{Character: "John", Dialogue: "Hello"},
+								models.Dialogue{Character: "Tom", Dialogue: "How are you?"},
 								models.Menu{Options: []models.Options{
-									{"option1", "otherLabel"},
-									{"option2", ""},
-									{"option3", ""},
+									{Text: "option1", Label: "otherLabel"},
+									{Text: "option2", Label: ""},
+									{Text: "option3", Label: ""},
 								}},
 							},
 							},
-							{"imageScene", []models.Command{models.Dialogue{"John", "Hello in scene2"}}},
+							{Scene: "imageScene", Commands: []models.Command{models.Dialogue{Character: "John", Dialogue: "Hello in scene2"}}},
 						},
 					},
 				},
@@ -96,19 +96,19 @@ func TestValidateDialogue(t *testing.T) {
 	}{
 		{
 			name:        "Dialogue is valid",
-			rowInfo:     models.RowInfo{models.DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Dialogue",
-			rowInfo:     models.RowInfo{models.MenuKind, "John", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.MenuKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Character is empty",
-			rowInfo:     models.RowInfo{models.DialogueKind, "", "Hello", "happy", "left", "", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.DialogueKind, Character: "", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -136,19 +136,19 @@ func TestValidateScene(t *testing.T) {
 	}{
 		{
 			name:        "Scene is valid",
-			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "", "imageScene", ""},
+			rowInfo:     models.RowInfo{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Scene with empty image",
-			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Scene",
-			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "", "imageScene", ""},
+			rowInfo:     models.RowInfo{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -176,19 +176,19 @@ func TestValidateMenu(t *testing.T) {
 	}{
 		{
 			name:        "Menu is valid",
-			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1|otherLabel;option2;option3", Image: "", Animation: ""},
 			expected:    true,
 			errExpected: nil,
 		},
 		{
 			name:        "Options is empty",
-			rowInfo:     models.RowInfo{models.MenuKind, "", "", "", "", "", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
 		{
 			name:        "Kind is not Menu",
-			rowInfo:     models.RowInfo{models.SceneKind, "", "", "", "", "option1|otherLabel;option2;option3", "", ""},
+			rowInfo:     models.RowInfo{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1|otherLabel;option2;option3", Image: "", Animation: ""},
 			expected:    false,
 			errExpected: nil,
 		},
@@ -217,7 +217,7 @@ func TestParseOptions(t *testing.T) {
 		{
 			name:     "Parses options",
 			options:  "option1;otherLabel|option2|option3",
-			expected: []models.Options{{"option1", "otherLabel"}, {"option2", ""}, {"option3", ""}},
+			expected: []models.Options{{Text: "option1", Label: "otherLabel"}, {Text: "option2", Label: ""}, {Text: "option3", Label: ""}},
 		},
 		{
 			name:        "Invalid options",
