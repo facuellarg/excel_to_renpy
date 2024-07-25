@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"renpy-transformer/models"
 	"text/template"
 )
 
@@ -10,7 +11,7 @@ type Writer struct {
 	mapper       *Mapper
 }
 
-func build(commands Command) string {
+func build(commands models.Command) string {
 	return commands.Build()
 }
 
@@ -23,7 +24,7 @@ func NewWriter(path string) *Writer {
 	return &w
 }
 
-func (w *Writer) RenpyInfoToText(rows []SheetInfo) (string, error) {
+func (w *Writer) RenpyInfoToText(rows []models.SheetInfo) (string, error) {
 	renpyInfo, err := w.mapper.RowsInfoToRenpyInfo(rows)
 	if err != nil {
 		return "", err
