@@ -9,4 +9,5 @@ type RowInfo struct {
 	Options    string
 	Image      string
 	Animation  string
+	Hide       string
 }

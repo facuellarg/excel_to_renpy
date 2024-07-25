@@ -18,6 +18,7 @@ const (
 	OPTIONS    Header = "options"
 	IMAGE      Header = "image"
 	ANIMATION  Header = "animation"
+	HIDE       Header = "hide"
 )
 
 var (
@@ -30,6 +31,7 @@ var (
 		OPTIONS:    5,
 		IMAGE:      6,
 		ANIMATION:  7,
+		HIDE:       8,
 	}
 )
 
@@ -91,6 +93,7 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]models.RowInfo, error) {
 			Options:    GetValue(row, HEADERS[OPTIONS]),
 			Image:      GetValue(row, HEADERS[IMAGE]),
 			Animation:  GetValue(row, HEADERS[ANIMATION]),
+			Hide:       GetValue(row, HEADERS[HIDE]),
 		}
 	}
 

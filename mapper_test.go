@@ -20,11 +20,19 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 				{
 					Name: "start",
 					Rows: []models.RowInfo{
-						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
-						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
-						{Kind: models.MenuKind, Character: "", Text: "", Expression: "", Position: "", Options: "option1;otherLabel|option2|option3", Image: "", Animation: ""},
-						{Kind: models.SceneKind, Character: "", Text: "", Expression: "", Position: "", Options: "", Image: "imageScene", Animation: ""},
-						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left", Options: "", Image: "", Animation: ""},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "I am angry", Expression: "angry", Position: "left"},
+						{Kind: models.DialogueKind, Character: "John", Text: "I still happy", Expression: "happy", Position: "left"},
+						{Kind: models.MenuKind, Options: "option1;otherLabel|option2|option3", Hide: "Tom"},
+						{Kind: models.SceneKind, Image: "imageScene"},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "left"},
+					},
+				},
+				{
+					Name: "otherLabel",
+					Rows: []models.RowInfo{
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in another label", Expression: "happy", Position: "left"},
 					},
 				},
 			},
@@ -34,8 +42,14 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 					{
 						Label: "start", Scenes: []models.Scene{
 							{Scene: "", Commands: []models.Command{
+								models.Show{Character: "John", Expression: "happy", Position: "left"},
 								models.Dialogue{Character: "John", Dialogue: "Hello"},
+								models.Show{Character: "Tom", Expression: "happy", Position: "left"},
 								models.Dialogue{Character: "Tom", Dialogue: "How are you?"},
+								models.Show{Character: "Tom", Expression: "angry", Position: "left"},
+								models.Dialogue{Character: "Tom", Dialogue: "I am angry"},
+								models.Dialogue{Character: "John", Dialogue: "I still happy"},
+								models.Hide{Text: "Tom"},
 								models.Menu{Options: []models.Options{
 									{Text: "option1", Label: "otherLabel"},
 									{Text: "option2", Label: ""},
@@ -43,7 +57,19 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 								}},
 							},
 							},
-							{Scene: "imageScene", Commands: []models.Command{models.Dialogue{Character: "John", Dialogue: "Hello in scene2"}}},
+							{Scene: "imageScene", Commands: []models.Command{
+								models.Show{Character: "John", Expression: "happy", Position: "left"},
+								models.Dialogue{Character: "John", Dialogue: "Hello in scene2"},
+							}},
+						},
+					},
+					{
+						Label: "otherLabel", Scenes: []models.Scene{
+							{
+								Scene: "", Commands: []models.Command{
+									models.Dialogue{Character: "John", Dialogue: "Hello in another label"},
+								},
+							},
 						},
 					},
 				},

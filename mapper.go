@@ -13,12 +13,14 @@ var (
 type Mapper struct {
 	optionsSplitChar string
 	labelSplitChar   string
+	hideSplitChar    string
 }
 
 func NewDefaultMapper() *Mapper {
 	return &Mapper{
 		optionsSplitChar: "|",
 		labelSplitChar:   ";",
+		hideSplitChar:    "|",
 	}
 }
 
@@ -31,6 +33,7 @@ func (m *Mapper) RowsInfoToRenpyInfo(sheets []models.SheetInfo) (*models.RenpyIn
 	renpyInfo.Characters = make([]string, 0)
 	charactersSet := make(map[string]struct{})
 	renpyInfo.Labels = make([]models.Label, 0)
+	charactersBeingShown := make(map[string]string) //character being shown an the current expression
 
 	for i, sheet := range sheets {
 		rows := sheet.Rows
@@ -40,42 +43,70 @@ func (m *Mapper) RowsInfoToRenpyInfo(sheets []models.SheetInfo) (*models.RenpyIn
 
 		renpyInfo.Labels = append(renpyInfo.Labels, models.Label{
 			Label: sheet.Name,
+			Scenes: []models.Scene{
+				{Scene: "", Commands: []models.Command{}},
+			},
 		})
 
-		currentScene := renpyInfo.Labels[i].Scenes
+		currentScene := &renpyInfo.Labels[i].Scenes[0]
+
 		for _, row := range rows {
+
+			if row.Hide != "" {
+				charactersToHide, _ := m.ParseHide(row.Hide)
+				for _, character := range charactersToHide {
+					currentScene.Commands = append(currentScene.Commands, models.Hide{
+						Text: character,
+					})
+					delete(charactersBeingShown, character)
+				}
+			}
+
 			if row.Kind == models.SceneKind {
-				currentScene = append(currentScene, models.Scene{
+				newScene := models.Scene{
 					Scene:    row.Image,
 					Commands: []models.Command{},
-				})
+				}
+				renpyInfo.Labels[i].Scenes = append(renpyInfo.Labels[i].Scenes, newScene)
+				currentScene = &renpyInfo.Labels[i].Scenes[len(renpyInfo.Labels[i].Scenes)-1]
+				charactersBeingShown = make(map[string]string)
+				continue
 			}
 
 			if row.Kind == models.DialogueKind {
-				if len(currentScene) == 0 {
-					// return nil, errors.New("No scene found")
-					currentScene = append(currentScene, models.Scene{})
-				}
 				if _, ok := charactersSet[row.Character]; !ok {
 					charactersSet[row.Character] = struct{}{}
 					renpyInfo.Characters = append(renpyInfo.Characters, row.Character)
 				}
-				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, models.Dialogue{
+
+				if expression, ok := charactersBeingShown[row.Character]; !ok || expression != row.Expression {
+					currentScene.Commands = append(currentScene.Commands, models.Show{
+						Character:  row.Character,
+						Position:   row.Position,
+						Expression: row.Expression,
+					})
+					charactersBeingShown[row.Character] = row.Expression
+				}
+
+				currentScene.Commands = append(currentScene.Commands, models.Dialogue{
 					Character: row.Character,
 					Dialogue:  row.Text,
 				})
+				continue
 			}
+
 			if row.Kind == models.MenuKind {
 				options, err := m.ParseOptions(row.Options)
 				if err != nil {
 					return nil, err
 				}
-				currentScene[len(currentScene)-1].Commands = append(currentScene[len(currentScene)-1].Commands, models.Menu{
+				currentScene.Commands = append(currentScene.Commands, models.Menu{
 					Options: options,
 				})
 			}
+
 		}
-		renpyInfo.Labels[i].Scenes = currentScene
+
 	}
 	return &renpyInfo, nil
 
@@ -147,4 +178,12 @@ func (m *Mapper) ParseOptions(options string) ([]models.Options, error) {
 	}
 
 	return optionsList, nil
+}
+
+func (m *Mapper) ParseHide(hide string) ([]string, error) {
+	if hide == "" {
+		return nil, nil
+	}
+	hideSplit := strings.Split(hide, m.hideSplitChar)
+	return hideSplit, nil
 }
