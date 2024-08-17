@@ -171,7 +171,7 @@ func (m *Mapper) ParseOptions(options string) ([]models.Options, error) {
 			Text: optionSplit[0],
 		}
 		if len(optionSplit) == 2 {
-			op.Label = optionSplit[1]
+			op.Content = optionSplit[1]
 		}
 		optionsList = append(optionsList, op)
 

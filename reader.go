@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"renpy-transformer/models"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -86,8 +87,8 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]models.RowInfo, error) {
 	for i, row := range rows[1:] {
 		renpyInfos[i] = models.RowInfo{
 			Kind:       models.StringToKind(GetValue(row, HEADERS[KIND])),
-			Character:  GetValue(row, HEADERS[CHARACTER]),
-			Text:       GetValue(row, HEADERS[TEXT]),
+			Character:  ParseCharacter(GetValue(row, HEADERS[CHARACTER])),
+			Text:       ParseDialogue(GetValue(row, HEADERS[TEXT])),
 			Expression: GetValue(row, HEADERS[EXPRESSION]),
 			Position:   GetValue(row, HEADERS[POSITION]),
 			Options:    GetValue(row, HEADERS[OPTIONS]),
@@ -113,4 +114,17 @@ func GetValueOrDefault[T any](row []T, index int, defaultValue T) T {
 		return defaultValue
 	}
 	return row[index]
+}
+
+func ParseCharacter(character string) string {
+	newName := strings.TrimSpace(character)
+	newName = strings.ToLower(newName)
+	newName = strings.ReplaceAll(newName, " ", "_")
+	return newName
+}
+
+func ParseDialogue(dialogue string) string {
+	newDialogue := strings.TrimSpace(dialogue)
+	newDialogue = strings.ReplaceAll(newDialogue, "\"", "\\\"")
+	return newDialogue
 }

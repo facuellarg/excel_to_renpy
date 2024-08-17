@@ -1,6 +1,9 @@
 package models
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 type Menu struct {
 	Options []Options
@@ -15,8 +18,12 @@ func (o Menu) Build() string {
 	for _, option := range o.Options {
 		buffer.WriteString("\n")
 		buffer.WriteString("    \"" + option.Text + "\"")
-		if option.Label != "" {
-			buffer.WriteString(":\n      jump " + option.Label)
+		if option.Content != "" {
+			buffer.WriteString(":\n      ")
+			if strings.Contains(option.Content, " ") {
+				buffer.WriteString("jump " + option.Content)
+			}
+			buffer.WriteString("\"" + option.Content + "\"")
 		}
 	}
 	return buffer.String()

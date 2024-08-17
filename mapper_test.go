@@ -51,9 +51,9 @@ func TestRowsInfoToRenpyInfo(t *testing.T) {
 								models.Dialogue{Character: "John", Dialogue: "I still happy"},
 								models.Hide{Text: "Tom"},
 								models.Menu{Options: []models.Options{
-									{Text: "option1", Label: "otherLabel"},
-									{Text: "option2", Label: ""},
-									{Text: "option3", Label: ""},
+									{Text: "option1", Content: "otherLabel"},
+									{Text: "option2", Content: ""},
+									{Text: "option3", Content: ""},
 								}},
 							},
 							},
@@ -243,7 +243,7 @@ func TestParseOptions(t *testing.T) {
 		{
 			name:     "Parses options",
 			options:  "option1;otherLabel|option2|option3",
-			expected: []models.Options{{Text: "option1", Label: "otherLabel"}, {Text: "option2", Label: ""}, {Text: "option3", Label: ""}},
+			expected: []models.Options{{Text: "option1", Content: "otherLabel"}, {Text: "option2", Content: ""}, {Text: "option3", Content: ""}},
 		},
 		{
 			name:        "Invalid options",
