@@ -4,6 +4,9 @@ import (
 	"errors"
 	"renpy-transformer/models"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -186,4 +189,14 @@ func (m *Mapper) ParseHide(hide string) ([]string, error) {
 	}
 	hideSplit := strings.Split(hide, m.hideSplitChar)
 	return hideSplit, nil
+}
+
+func MapNameToDialogueName(name string) string {
+	newName := strings.TrimSpace(name)
+	names := strings.Split(newName, "_")
+	for i, n := range names {
+		names[i] = cases.Title(language.English).String(n)
+	}
+	return strings.Join(names, " ")
+
 }

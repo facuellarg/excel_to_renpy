@@ -1,4 +1,4 @@
-{{range .Characters}}define {{.}} = Character("{{.}}")
+{{range .Characters}}define {{.}} = Character("{{map_name .}}")
 {{end}}
 {{range .Labels}}label {{ .Label}}:{{range .Scenes}}
 {{if .Scene}}  scene {{.Scene}}{{end}}
