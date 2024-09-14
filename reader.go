@@ -48,16 +48,19 @@ func ReadExcel(path string) ([]models.SheetInfo, error) {
 		}
 	}()
 	sheetNames := f.GetSheetList()
-	sheetInfos := make([]models.SheetInfo, len(sheetNames))
-	for i, sheet := range sheetNames {
+	sheetInfos := make([]models.SheetInfo, 0, len(sheetNames))
+	for _, sheet := range sheetNames {
 		rows, err := ReadSheetInfo(f, sheet)
 		if err != nil {
 			return nil, err
 		}
-		sheetInfos[i] = models.SheetInfo{
+		if len(rows) == 0 {
+			continue
+		}
+		sheetInfos = append(sheetInfos, models.SheetInfo{
 			Name: sheet,
 			Rows: rows,
-		}
+		})
 	}
 
 	return sheetInfos, nil
@@ -73,6 +76,7 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]models.RowInfo, error) {
 	}
 
 	if len(rows) == 0 {
+		return nil, nil
 		return nil, fmt.Errorf("no rows found")
 	}
 	for j, header := range rows[0] {

@@ -20,7 +20,7 @@ func (o Menu) Build() string {
 		buffer.WriteString("    \"" + option.Text + "\"")
 		if option.Content != "" {
 			buffer.WriteString(":\n      ")
-			if strings.Contains(option.Content, " ") {
+			if !strings.Contains(option.Content, " ") {
 				buffer.WriteString("jump " + option.Content)
 			}
 			buffer.WriteString("\"" + option.Content + "\"")

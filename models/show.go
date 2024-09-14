@@ -1,6 +1,10 @@
 package models
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+	"strings"
+)
 
 type Show struct {
 	Character  string
@@ -13,8 +17,12 @@ func (s Show) Build() string {
 	buffer.WriteString("show ")
 	buffer.WriteString(s.Character)
 	if s.Expression != "" {
-		buffer.WriteString(" ")
-		buffer.WriteString(s.Expression)
+		if strings.Contains(s.Expression, " ") {
+			fmt.Printf("Character %s has an expression with a space, please remove it\nExpression %s\n", s.Character, s.Expression)
+		} else {
+			buffer.WriteString(" ")
+			buffer.WriteString(s.Expression)
+		}
 	}
 
 	if s.Position != "" {
