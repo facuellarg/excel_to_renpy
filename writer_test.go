@@ -1,6 +1,7 @@
 package main
 
 import (
+	"renpy-transformer/models"
 	"strings"
 	"testing"
 
@@ -10,20 +11,29 @@ import (
 func TestWriter(t *testing.T) {
 	tableTest := []struct {
 		name         string
-		sheetsInfo   []SheetInfo
+		sheetsInfo   []models.SheetInfo
 		textExpected string
 		errExpected  error
 	}{
 		{
 			name: "Writes a Renpy file",
-			sheetsInfo: []SheetInfo{
+			sheetsInfo: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
+					Rows: []models.RowInfo{
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left"},
+						{Kind: models.MenuKind, Options: "option1;otherLabel|option2|option3"},
+						{Kind: models.SceneKind, Image: "imageScene", Hide: "Tom"},
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in scene2", Expression: "happy", Position: "right"},
+						{Kind: models.DialogueKind, Character: "John", Text: "I am angry", Expression: "angry", Position: "right"},
+					},
+				},
+				{
+					Name: "otherLabel",
+					Rows: []models.RowInfo{
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello in another label", Expression: "angry", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "Hello in another label", Expression: "happy", Position: "left"},
 					},
 				},
 			},
@@ -32,86 +42,32 @@ define Tom = Character("Tom")
 
 label start:
 
+  show John happy at left
   John "Hello"
+  show Tom happy at left
   Tom "How are you?"
-
-  scene imageScene
-  John "Hello in scene2"`,
-			errExpected: nil,
-		},
-		{
-			name: "Writes a Renpy file with menu",
-			sheetsInfo: []SheetInfo{
-				{
-					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-					},
-				},
-			},
-			textExpected: `define John = Character("John")
-define Tom = Character("Tom")
-
-label start:
-
-  John "Hello"
-  Tom "How are you?"
-
-  scene imageScene
-  John "Hello in scene2"
-  menu:
-    "option1":
-      jump otherLabel
-    "option2"
-    "option3"`,
-			errExpected: nil,
-		},
-		{
-			name: "Writes a Renpy file with two sheets",
-			sheetsInfo: []SheetInfo{
-				{
-					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
-						{DialogueKind, "John", "Hello in scene2", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-					},
-				},
-				{
-					Name: "anotherLabel",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello in another label", "happy", "left", "", "", ""},
-					},
-				},
-			},
-			textExpected: `define John = Character("John")
-define Tom = Character("Tom")
-
-label start:
-
-  John "Hello"
-  Tom "How are you?"
-
-  scene imageScene
-  John "Hello in scene2"
   menu:
     "option1":
       jump otherLabel
     "option2"
     "option3"
+  hide Tom
 
-label anotherLabel:
+  scene imageScene
+  show John happy at right
+  John "Hello in scene2"
+  show John angry at right
+  John "I am angry"
 
-  John "Hello in another label"`,
+label otherLabel:
+
+  John "Hello in another label"
+  show Tom happy at left
+  Tom "Hello in another label"`,
 			errExpected: nil,
 		},
 	}
+
 	for _, tt := range tableTest {
 		t.Run(tt.name, func(t *testing.T) {
 			renpyInfo := tt.sheetsInfo

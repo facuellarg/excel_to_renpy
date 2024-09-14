@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"renpy-transformer/models"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -17,6 +19,7 @@ const (
 	OPTIONS    Header = "options"
 	IMAGE      Header = "image"
 	ANIMATION  Header = "animation"
+	HIDE       Header = "hide"
 )
 
 var (
@@ -29,10 +32,11 @@ var (
 		OPTIONS:    5,
 		IMAGE:      6,
 		ANIMATION:  7,
+		HIDE:       8,
 	}
 )
 
-func ReadExcel(path string) ([]SheetInfo, error) {
+func ReadExcel(path string) ([]models.SheetInfo, error) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		return nil, err
@@ -44,22 +48,25 @@ func ReadExcel(path string) ([]SheetInfo, error) {
 		}
 	}()
 	sheetNames := f.GetSheetList()
-	sheetInfos := make([]SheetInfo, len(sheetNames))
-	for i, sheet := range sheetNames {
+	sheetInfos := make([]models.SheetInfo, 0, len(sheetNames))
+	for _, sheet := range sheetNames {
 		rows, err := ReadSheetInfo(f, sheet)
 		if err != nil {
 			return nil, err
 		}
-		sheetInfos[i] = SheetInfo{
+		if len(rows) == 0 {
+			continue
+		}
+		sheetInfos = append(sheetInfos, models.SheetInfo{
 			Name: sheet,
 			Rows: rows,
-		}
+		})
 	}
 
 	return sheetInfos, nil
 }
 
-func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
+func ReadSheetInfo(f *excelize.File, sheet string) ([]models.RowInfo, error) {
 
 	rows, err := f.GetRows(sheet, excelize.Options{
 		RawCellValue: true,
@@ -69,6 +76,7 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
 	}
 
 	if len(rows) == 0 {
+		return nil, nil
 		return nil, fmt.Errorf("no rows found")
 	}
 	for j, header := range rows[0] {
@@ -79,17 +87,18 @@ func ReadSheetInfo(f *excelize.File, sheet string) ([]RowInfo, error) {
 		HEADERS[h] = j
 	}
 
-	renpyInfos := make([]RowInfo, len(rows)-1)
+	renpyInfos := make([]models.RowInfo, len(rows)-1)
 	for i, row := range rows[1:] {
-		renpyInfos[i] = RowInfo{
-			Kind:       StringToKind(GetValue(row, HEADERS[KIND])),
-			Character:  GetValue(row, HEADERS[CHARACTER]),
-			Text:       GetValue(row, HEADERS[TEXT]),
+		renpyInfos[i] = models.RowInfo{
+			Kind:       models.StringToKind(GetValue(row, HEADERS[KIND])),
+			Character:  ParseCharacter(GetValue(row, HEADERS[CHARACTER])),
+			Text:       ParseDialogue(GetValue(row, HEADERS[TEXT])),
 			Expression: GetValue(row, HEADERS[EXPRESSION]),
 			Position:   GetValue(row, HEADERS[POSITION]),
 			Options:    GetValue(row, HEADERS[OPTIONS]),
 			Image:      GetValue(row, HEADERS[IMAGE]),
 			Animation:  GetValue(row, HEADERS[ANIMATION]),
+			Hide:       GetValue(row, HEADERS[HIDE]),
 		}
 	}
 
@@ -109,4 +118,17 @@ func GetValueOrDefault[T any](row []T, index int, defaultValue T) T {
 		return defaultValue
 	}
 	return row[index]
+}
+
+func ParseCharacter(character string) string {
+	newName := strings.TrimSpace(character)
+	newName = strings.ToLower(newName)
+	newName = strings.ReplaceAll(newName, " ", "_")
+	return newName
+}
+
+func ParseDialogue(dialogue string) string {
+	newDialogue := strings.TrimSpace(dialogue)
+	newDialogue = strings.ReplaceAll(newDialogue, "\"", "\\\"")
+	return newDialogue
 }

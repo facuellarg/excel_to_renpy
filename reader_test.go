@@ -1,6 +1,7 @@
 package main
 
 import (
+	"renpy-transformer/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,26 +13,28 @@ func TestReadExcel(t *testing.T) {
 	tableTest := []struct {
 		name              string
 		path              string
-		sheetInfoExpected []SheetInfo
+		sheetInfoExpected []models.SheetInfo
 		errExpected       error
 	}{
 		{
 			name: "Reads a Renpy file with two sheets",
 			path: "test.xlsx",
-			sheetInfoExpected: []SheetInfo{
+			sheetInfoExpected: []models.SheetInfo{
 				{
 					Name: "start",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-						{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-						{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-						{SceneKind, "", "", "", "", "", "imageScene", ""},
+					Rows: []models.RowInfo{
+						{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left"},
+						{Kind: models.MenuKind, Options: "option1;otherLabel|option2|option3"},
+						{Kind: models.SceneKind, Image: "imageScene", Hide: "John"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "Hello after scene", Expression: "happy", Position: "left"},
+						{Kind: models.DialogueKind, Character: "Tom", Text: "I am angry now", Expression: "angry", Position: "left"},
 					},
 				},
 				{
-					Name: "anotherLabel",
-					Rows: []RowInfo{
-						{DialogueKind, "John", "Hello from another label", "happy", "left", "", "", ""},
+					Name: "otherLabel",
+					Rows: []models.RowInfo{
+						{Kind: models.DialogueKind, Character: "Tom", Text: "Hello from another label", Expression: "angry", Position: "left", Options: "", Image: "", Animation: ""},
 					},
 				},
 			},
@@ -60,6 +63,7 @@ func TestReadExcel(t *testing.T) {
 					assert.Equal(t, tt.sheetInfoExpected[i].Rows[j].Options, row.Options)
 					assert.Equal(t, tt.sheetInfoExpected[i].Rows[j].Image, row.Image)
 					assert.Equal(t, tt.sheetInfoExpected[i].Rows[j].Animation, row.Animation)
+					assert.Equal(t, tt.sheetInfoExpected[i].Rows[j].Hide, row.Hide)
 				}
 			}
 		})
@@ -71,17 +75,19 @@ func TestReadSheetInfo(t *testing.T) {
 	tableTest := []struct {
 		name          string
 		path          string
-		renpyExpected []RowInfo
+		renpyExpected []models.RowInfo
 		errExpected   error
 	}{
 		{
 			name: "Reads a Renpy file",
 			path: "test.xlsx",
-			renpyExpected: []RowInfo{
-				{DialogueKind, "John", "Hello", "happy", "left", "", "", ""},
-				{DialogueKind, "Tom", "How are you?", "happy", "left", "", "", ""},
-				{MenuKind, "", "", "", "", "option1;otherLabel|option2|option3", "", ""},
-				{SceneKind, "", "", "", "", "", "imageScene", ""},
+			renpyExpected: []models.RowInfo{
+				{Kind: models.DialogueKind, Character: "John", Text: "Hello", Expression: "happy", Position: "left"},
+				{Kind: models.DialogueKind, Character: "Tom", Text: "How are you?", Expression: "happy", Position: "left"},
+				{Kind: models.MenuKind, Options: "option1;otherLabel|option2|option3"},
+				{Kind: models.SceneKind, Image: "imageScene", Hide: "John"},
+				{Kind: models.DialogueKind, Character: "Tom", Text: "Hello after scene", Expression: "happy", Position: "left"},
+				{Kind: models.DialogueKind, Character: "Tom", Text: "I am angry now", Expression: "angry", Position: "left"},
 			},
 			errExpected: nil,
 		},
